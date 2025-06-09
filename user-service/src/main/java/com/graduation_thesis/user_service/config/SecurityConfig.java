@@ -43,7 +43,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withJwkSetUri("http://localhost:8080/realms/muscle-gym-app/protocol/openid-connect" +
+        return NimbusJwtDecoder.withJwkSetUri("http://localhost:8080/realms/muscle_gym/protocol/openid-connect" +
                 "/certs").build();
     }
 }
