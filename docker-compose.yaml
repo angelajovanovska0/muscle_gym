@@ -1,0 +1,56 @@
+services:
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_DB: muscle_gym
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  keycloak:
+   image: quay.io/keycloak/keycloak:24.0.3
+   container_name: keycloak
+   command: start-dev
+   environment:
+    KEYCLOAK_ADMIN: admin
+    KEYCLOAK_ADMIN_PASSWORD: admin
+    KC_DB: dev-file
+    KC_HOSTNAME_STRICT: "false"
+   ports:
+    - "8080:8080"
+
+  discovery-server:
+    build:
+      context: ./discovery-server
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+
+  exercise-service:
+    build:
+      context: ./exercise-service
+    container_name: exercise-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - discovery-server
+      - postgres
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8088:8088"
+    depends_on:
+      - discovery-server
+
+volumes:
+  pgdata:
